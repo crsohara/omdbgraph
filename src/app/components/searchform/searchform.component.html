@@ -1,0 +1,75 @@
+<form class="mb-3 mt-3" #searchForm="ngForm" (ngSubmit)=(onSubmit(searchForm))>
+  <div class="form-inline">
+    <input class="form-control mr-3"
+      type="text"
+      name="search"
+      #searchInput="ngModel"
+      [(ngModel)]="formInput.searchInputText"
+      [ngClass]="{'is-invalid':searchInput.errors && searchInput.touched}"
+      required
+      minlength="2">
+
+    <div class="invalid-feedback"
+      [hidden]="!searchInput.errors?.required">
+      Please enter a title!
+    </div>
+
+    <div class="invalid-feedback"
+      [hidden]="!searchInput.errors?.minlength">
+      invalid!
+    </div>
+
+    <button class="btn btn-primary"
+      [disabled]="!searchForm.form.valid">
+      Search
+    </button>
+
+  </div>
+</form>
+
+<div *ngIf="loading">
+  <i class="fa fa-circle-o-notch fa-spin"></i>
+</div>
+<style>.ngx-charts text {
+    fill: white !important;
+  }</style>
+<ngx-charts-line-chart
+  *ngIf="single && single.length > 0"
+  [view]="view"
+  [results]="single"
+  [gradient]="gradient"
+  [autoScale]="autoScale"
+  [xAxis]="showXAxis"
+  [yAxis]="showYAxis"
+  [legend]="showLegend"
+  [showXAxisLabel]="showXAxisLabel"
+  [showYAxisLabel]="showYAxisLabel"
+  [xAxisLabel]="xAxisLabel"
+  [yAxisLabel]="yAxisLabel"
+>
+<!-- (select)="onSelect($event)" -->
+</ngx-charts-line-chart>
+
+<div class="card mb-3 p-3 bg-dark text-light border-light" *ngIf="!loading && loaded ">
+  <div *ngIf="resultType === 'series'">
+    <div *ngFor="let season of series">
+      <strong>Season {{ season.season }}:</strong>
+      <div *ngFor="let episode of season.episodes">
+        {{ episode.imdbRating }} {{ episode.Title }}
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="resultType === 'movie'">
+    <div class="media-body mb-0 small lh-125 border-gray">
+      <div>
+        <strong>Title: </strong>
+      </div>
+      <span>{{ result?.Title }}</span>
+      <div>
+        <strong>Rating: </strong>
+      </div>
+      <span>{{ result?.Ratings[0].Value }} ({{ result?.Ratings[0].Source }})</span>
+    </div>
+  </div>
+</div>
