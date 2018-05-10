@@ -9,12 +9,14 @@ import { AppComponent } from './app.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { SearchformComponent } from './components/searchform/searchform.component';
 import { QueryService } from './services/query.service';
+import { GraphComponent } from './components/graph/graph.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     NavbarComponent,
-    SearchformComponent
+    SearchformComponent,
+    GraphComponent
   ],
   imports: [
     HttpClientModule,
