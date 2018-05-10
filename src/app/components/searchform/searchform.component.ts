@@ -29,11 +29,12 @@ export class SearchformComponent implements OnInit {
 
   // private result: {Response: string, Error, string};
   private result: { Response: string, Error?: string, [key: string]: string };
-  private loaded: boolean = false;
+  public loaded: boolean = false; // private
   private loadingAnimation: boolean = false;
-  private loading: boolean;
-  private formInput = {
-    searchInput: ''
+  public loading: boolean; // private
+  public formInput = { // private
+    searchInput: '',
+    searchInputText: ''
   };
 
   constructor(private queryService: QueryService) { }

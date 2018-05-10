@@ -21,8 +21,9 @@ export class GraphComponent implements OnInit {
   private xAxisLabel = 'Episode';
   private showYAxisLabel = true;
   private yAxisLabel = 'IMDB Rating';
-  private single: any[];
-  private progress: any;
+
+  public single: any[]; // private
+  public progress: any; // private
 
   constructor(private queryService: QueryService) { }
 
