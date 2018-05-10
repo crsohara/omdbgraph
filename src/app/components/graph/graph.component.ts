@@ -22,12 +22,16 @@ export class GraphComponent implements OnInit {
   private showYAxisLabel = true;
   private yAxisLabel = 'IMDB Rating';
   private single: any[];
+  private progress: any;
 
   constructor(private queryService: QueryService) { }
 
   ngOnInit() {
     this.queryService.p_currentSeries.subscribe( series => {
       this.single = series;
+    });
+    this.queryService.p_queryProgress.subscribe( progress => {
+      this.progress = progress;
     });
   }
 

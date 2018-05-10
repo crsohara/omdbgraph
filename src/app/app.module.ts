@@ -22,8 +22,8 @@ import { GraphComponent } from './components/graph/graph.component';
     HttpClientModule,
     HttpClientJsonpModule,
     BrowserModule,
-    FormsModule,
     BrowserAnimationsModule,
+    FormsModule,
     NgxChartsModule
   ],
   providers: [

@@ -19,9 +19,17 @@ export class QueryService {
   private currentSeries = new BehaviorSubject([]);
   p_currentSeries = this.currentSeries.asObservable();
 
+  private progress = {current: 0, total: null};
+
+  private queryProgress = new BehaviorSubject(this.progress);
+  p_queryProgress = this.queryProgress.asObservable();
+
   constructor(private http: HttpClient, ) { }
 
   getResult(title: string): Observable<any> {
+    this.progress = {current: 0, total: null};
+    this.queryProgress.next({current: 0, total: null});
+    this.currentSeries.next([]);
     return this.http.jsonp(`${baseUrl}&t=${title}`, '').pipe(map(response => {
       return response;
     }));
@@ -35,9 +43,14 @@ export class QueryService {
   }
 
   getSeasons(seasons: any[], imdbID: string): Observable<any> {
+    this.progress.total = seasons.length;
+
     return forkJoin(
       seasons.map( season => {
         return this.getSeason(imdbID, season).pipe(map((currentSeason, i) => {
+          console.log('got a season');
+          this.progress.current = this.progress.current + 1;
+          this.queryProgress.next(this.progress);
           return {
             episodes: currentSeason.Episodes,
             season: currentSeason.Season

@@ -24,20 +24,27 @@
     </div>
 
     <button class="btn btn-primary"
-      [disabled]="!searchForm.form.valid">
+      [disabled]="!searchForm.form.valid || loading">
       Search
     </button>
 
   </div>
 </form>
 
-<div class="d-flex justify-content-center" *ngIf="loading" >
-  <i class="fa fa-circle-o-notch fa-spin"></i>
+<div class="d-flex justify-content-center" *ngIf="loading">
+  <i class="fa fa-circle-o-notch"
+    [@loadingState]="{value: loadingAnimation}"
+    (@loadingState.done)="onAnimationDone($event)"
+  ></i>
 </div>
 
 <div class="card mb-3 p-3 bg-dark text-light border-light" *ngIf="!loading && loaded ">
 
-  <div *ngIf="resultType === 'movie' || resultType === 'series' ">
+  <div *ngIf="result?.Error">
+    {{ result?.Error }}
+  </div>
+
+  <div *ngIf="result.Type === 'movie' || result.Type === 'series' ">
     <div class="media-body mb-0 small lh-125 border-gray">
       <div>
         <strong>Title: </strong>
