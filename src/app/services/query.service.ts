@@ -9,7 +9,7 @@ const httpHeaders = {
     'content-type': 'application/jsonp'
   })
 };
-const baseUrl = 'http://www.omdbapi.com/?callback=JSONP_CALLBACK&apikey=' + environment.OMDB_API_KEY;
+const baseUrl = '//www.omdbapi.com/?callback=JSONP_CALLBACK&apikey=' + environment.OMDB_API_KEY;
 
 @Injectable({
   providedIn: 'root'
