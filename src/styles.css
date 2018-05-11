@@ -1,3 +1,10 @@
 /* You can add global styles to this file, and also import other style files */
-.ngx-charts text {fill: white !important;}
-   .ngx-charts .gridline-path {stroke: rgb(100, 100, 100);}
+.ngx-charts text {
+  fill: white !important;
+}
+.ngx-charts .gridline-path.gridline-path-vertical {
+  stroke: transparent !important;
+}
+.ngx-charts .gridline-path {
+  stroke: rgb(73, 73, 73) !important;
+}

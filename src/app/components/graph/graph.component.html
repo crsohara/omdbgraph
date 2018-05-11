@@ -1,7 +1,8 @@
-<div class="container" *ngIf="progress.total > 0">
-  Loading: {{ progress.current }} / {{ progress.total }}
+<div *ngIf="selectedEpisode">
+  Episode {{ selectedEpisode?.number }}: {{ selectedEpisode?.title }}
 </div>
-<div class="chart-container" *ngIf="single.length > 0">
+
+<div class="chart-container" *ngIf="single.length > 0 && !hideGraph">
   <ngx-charts-line-chart
     *ngIf="single"
     [results]="single"
@@ -14,6 +15,16 @@
     [showYAxisLabel]="showYAxisLabel"
     [xAxisLabel]="xAxisLabel"
     [yAxisLabel]="yAxisLabel"
+    (select)="onSelect($event)"
+    (activate)="onMouseEnter($event)"
+    (deactivate)="onMouseExit($event)"
   >
+
+
+    <ng-template #tooltipTemplate let-model="model">
+      <div>Episode: {{ model | json }}</div>
+      <div>Episode: {{ model.name }}</div>
+      <div>Rating: {{ model.value }}</div>
+    </ng-template>
   </ngx-charts-line-chart>
 </div>

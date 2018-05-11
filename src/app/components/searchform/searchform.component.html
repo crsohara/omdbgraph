@@ -1,3 +1,8 @@
+<div class="myprogress" *ngIf="progress.current !== progress.total" style="position:fixed;top:0;left:0;right:0;height:1px;background:white;display:flex;">
+<div class="crude-progress-bar" style="transition: 0.25s ease width;background: red;" [ngStyle]="{'width': (progress.current/progress.total)*100 + '%'}"></div>
+</div>
+
+
 <form class="mb-3 mt-3" #searchForm="ngForm" (ngSubmit)=(onSubmit(searchForm))>
   <div class="form-inline align-items-start justify-content-center">
     <div class="form-control-group">
@@ -24,19 +29,21 @@
     </div>
 
     <button class="btn btn-primary"
-      [disabled]="!searchForm.form.valid || loading">
-      Search
+      [disabled]="!searchForm.form.valid || loading" style="position: relative;">
+
+      <span [ngStyle]="{'opacity': loading ? 0 : 1}">Search</span>
+
+      <div class="d-flex justify-content-center spinner-wrap" *ngIf="loading">
+        <i ng-cloak class="fa fa-circle-o-notch"
+          [@loadingState]="{value: loadingAnimation}"
+          (@loadingState.done)="onAnimationDone($event)"
+        ></i>
+      </div>
+
     </button>
 
   </div>
 </form>
-
-<div class="d-flex justify-content-center" *ngIf="loading">
-  <i class="fa fa-circle-o-notch"
-    [@loadingState]="{value: loadingAnimation}"
-    (@loadingState.done)="onAnimationDone($event)"
-  ></i>
-</div>
 
 <div class="card mb-3 p-3 bg-dark text-light border-light" *ngIf="!loading && loaded ">
 

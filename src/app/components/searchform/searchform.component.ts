@@ -27,19 +27,18 @@ export class SearchformComponent implements OnInit {
 
   @ViewChild('searchForm') form: any;
 
-  // private result: {Response: string, Error, string};
   private result: { Response: string, Error?: string, [key: string]: string };
-  public loaded: boolean = false; // private
   private loadingAnimation: boolean = false;
-  public loading: boolean; // private
-  public formInput = { // private
-    searchInput: '',
-    searchInputText: ''
-  };
+
+  public loaded: boolean = false;
+  public progress: { current: number, total: number } = { current: 0, total: 100 };
+  public loading: boolean;
+  public formInput: { searchInputText: string } = { searchInputText: '' };
 
   constructor(private queryService: QueryService) { }
 
   ngOnInit() {
+    this.queryService.p_queryProgress.subscribe( progress => this.progress = progress );
   }
 
   onAnimationDone(event): void {
@@ -58,11 +57,15 @@ export class SearchformComponent implements OnInit {
 
     this.queryService.getResult(value.search).subscribe( result => {
       this.result = result;
+
       if ( this.result.Response.toLowerCase() === 'true') {
 
         if (result.Type === 'movie') {
           this.loading = false;
           this.loaded = true;
+          this.queryService.completeLoadingBar();
+          this.queryService.hideGraph(true);
+
         } else if (result.Type === 'series') {
           // get an array of season numbers
           const seasons: number[] = new Array(parseInt(result.totalSeasons, 10)).fill('').map((v, i) => i + 1);
@@ -71,12 +74,15 @@ export class SearchformComponent implements OnInit {
             this.loading = false;
             this.loaded = true;
             this.queryService.setSeries(series);
+            this.queryService.completeLoadingBar();
+            this.queryService.hideGraph(false);
           });
         }
       } else {
         this.loading = false;
         this.loaded = true;
         this.result = result;
+        this.queryService.completeLoadingBar();
       }
     });
   }

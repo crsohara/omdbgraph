@@ -20,10 +20,12 @@ export class GraphComponent implements OnInit {
   private showXAxisLabel = true;
   private xAxisLabel = 'Episode';
   private showYAxisLabel = true;
-  private yAxisLabel = 'IMDB Rating';
+  private yAxisLabel = 'Rating';
 
+  public hideGraph: boolean = true;
   public single: any[]; // private
   public progress: any; // private
+  public selectedEpisode: {title: string, number: string};
 
   constructor(private queryService: QueryService) { }
 
@@ -33,6 +35,20 @@ export class GraphComponent implements OnInit {
     });
     this.queryService.p_queryProgress.subscribe( progress => {
       this.progress = progress;
+    });
+    this.queryService.p_hideGraph.subscribe ( hideGraph => {
+      this.hideGraph = hideGraph;
+    });
+  }
+  onSelect(event: {name: string}) {
+    const index = event.name.split('.');
+    this.single[parseInt(index[0], 10) - 1].series.forEach( episode => {
+      if (episode.name === event.name) {
+        this.selectedEpisode = {
+          title: episode.extra.episodeTitle,
+          number: episode.name
+        };
+      }
     });
   }
 
