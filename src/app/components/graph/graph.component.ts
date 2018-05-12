@@ -51,5 +51,9 @@ export class GraphComponent implements OnInit {
       }
     });
   }
+  onMouseEnter(event) {
+  }
+  onMouseExit(event) {
+  }
 
 }

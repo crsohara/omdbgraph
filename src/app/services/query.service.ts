@@ -40,7 +40,7 @@ export class QueryService {
       .pipe(
         timeout(3000),
         retryWhen( error => {
-          console.log('Season request is taking too long, retrying1...');
+          console.log('Season request is taking too long, retrying...');
           return error.pipe(delay(200));
         }),
         map(response => {
@@ -57,7 +57,7 @@ export class QueryService {
       .pipe(
         timeout(1000),
         retryWhen( error => {
-          console.log('Item Title request is taking too long, retrying2...');
+          console.log('Item Title request is taking too long, retrying...');
           return error.pipe(delay(200));
         }),
         map(response => {
