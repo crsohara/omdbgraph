@@ -26,6 +26,7 @@ import { trigger, state, style, animate, transition } from '@angular/animations'
 export class SearchformComponent implements OnInit {
 
   @ViewChild('searchForm') form: any;
+  @ViewChild('apikeyForm') apiKeyform: any;
 
   private result: { Response: string, Error?: string, [key: string]: string };
   private loadingAnimation: boolean = false;
@@ -35,9 +36,19 @@ export class SearchformComponent implements OnInit {
   public loading: boolean;
   public formInput: { searchInputText: string } = { searchInputText: '' };
 
+  private apikey;
+
   constructor(private queryService: QueryService) { }
 
   ngOnInit() {
+    const apikey = localStorage.getItem('omdbapikey');
+    if (apikey === null) {
+      console.log('No API key found in localstorage, please visit https://www.omdbapi.com/');
+      // prompt key input
+    } else {
+      console.log('Loading API key from localstorage');
+      this.queryService.setApiKey(apikey);
+    }
     this.queryService.p_queryProgress.subscribe( progress => this.progress = progress );
   }
 
@@ -53,38 +64,43 @@ export class SearchformComponent implements OnInit {
   }
 
   onSubmit({value, valid}: {value: {search: string}, valid: string}) {
-    this.loading = true;
+    if (this.queryService.isApiKeySet()) {
+      this.loading = true;
 
-    this.queryService.getResult(value.search).subscribe( result => {
-      this.result = result;
+      this.queryService.getResult(value.search).subscribe( result => {
+        this.result = result;
 
-      if ( this.result.Response.toLowerCase() === 'true') {
+        if ( this.result.Response.toLowerCase() === 'true') {
 
-        if (result.Type === 'movie') {
-          this.loading = false;
-          this.loaded = true;
-          this.queryService.completeLoadingBar();
-          this.queryService.hideGraph(true);
-
-        } else if (result.Type === 'series') {
-          // get an array of season numbers
-          const seasons: number[] = new Array(parseInt(result.totalSeasons, 10)).fill('').map((v, i) => i + 1);
-
-          this.queryService.getSeasonsFormattedForGraph(seasons, result.imdbID).subscribe( series => {
+          if (result.Type === 'movie') {
             this.loading = false;
             this.loaded = true;
-            this.queryService.setSeries(series);
             this.queryService.completeLoadingBar();
-            this.queryService.hideGraph(false);
-          });
+            this.queryService.hideGraph(true);
+
+          } else if (result.Type === 'series') {
+            // get an array of season numbers
+            const seasons: number[] = new Array(parseInt(result.totalSeasons, 10)).fill('').map((v, i) => i + 1);
+
+            this.queryService.getSeasonsFormattedForGraph(seasons, result.imdbID).subscribe( series => {
+              this.loading = false;
+              this.loaded = true;
+              this.queryService.setSeries(series);
+              this.queryService.completeLoadingBar();
+              this.queryService.hideGraph(false);
+            });
+          }
+        } else {
+          this.loading = false;
+          this.loaded = true;
+          this.result = result;
+          this.queryService.completeLoadingBar();
         }
-      } else {
-        this.loading = false;
-        this.loaded = true;
-        this.result = result;
-        this.queryService.completeLoadingBar();
-      }
-    });
+      });
+    }
+  }
+  addApiKey({value, valid}: {value: {apikey: string}, valid: string}) {
+    this.queryService.setApiKey(value.apikey, true);
   }
 
 }

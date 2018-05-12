@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, forkJoin, BehaviorSubject, of } from 'rxjs';
 import { map, timeout, retryWhen, delay, catchError } from 'rxjs/operators';
@@ -9,12 +10,14 @@ const httpHeaders = {
     'content-type': 'application/jsonp'
   })
 };
-const baseUrl = '//www.omdbapi.com/?callback=JSONP_CALLBACK&apikey=' + environment.OMDB_API_KEY;
+const baseUrl = `//www.omdbapi.com/?callback=JSONP_CALLBACK`;
 
 @Injectable({
   providedIn: 'root'
 })
 export class QueryService {
+
+  private apiKey: string = null;
 
   private currentSeries = new BehaviorSubject([]);
   p_currentSeries = this.currentSeries.asObservable();
@@ -27,10 +30,12 @@ export class QueryService {
   private hideGraphBool = new BehaviorSubject(false);
   p_hideGraph = this.hideGraphBool.asObservable();
 
-  constructor(private http: HttpClient, ) { }
+  constructor( private http: HttpClient ) {
+
+  }
 
   getSeason(imdbID: string, season: number): Observable<any> {
-    const params = `&i=${imdbID}&Season=${season}`;
+    const params = `${this.apiKey}&i=${imdbID}&Season=${season}`;
     return this.http.jsonp(`${baseUrl}${params}`, '')
       .pipe(
         timeout(3000),
@@ -48,7 +53,7 @@ export class QueryService {
   getResult(title: string): Observable<any> {
     this.queryProgress.next({ current: 1, total: 100 });
 
-    return this.http.jsonp(`${baseUrl}&t=${title}`, '')
+    return this.http.jsonp(`${baseUrl}${this.apiKey}&t=${title}`, '')
       .pipe(
         timeout(1000),
         retryWhen( error => {
@@ -108,5 +113,16 @@ export class QueryService {
 
   setSeries(series: any) {
     this.currentSeries.next(series);
+  }
+  setApiKey(apikey: string, saveToLocalstorage: boolean = false) {
+    console.log('setting API key to localstorage API key');
+    this.apiKey = `&apikey=${apikey}`;
+    if (saveToLocalstorage) {
+      localStorage.setItem('omdbapikey', apikey);
+      console.log('API key saved to your localstorage!');
+    }
+  }
+  isApiKeySet(): boolean {
+    return this.apiKey !== null;
   }
 }

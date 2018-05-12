@@ -1,9 +1,31 @@
 <div class="myprogress" *ngIf="progress.current !== progress.total" style="position:fixed;top:0;left:0;right:0;height:1px;background:white;display:flex;">
-<div class="crude-progress-bar" style="transition: 0.25s ease width;background: red;" [ngStyle]="{'width': (progress.current/progress.total)*100 + '%'}"></div>
+  <div class="crude-progress-bar" style="transition: 0.25s ease width;background: red;" [ngStyle]="{'width': (progress.current/progress.total)*100 + '%'}"></div>
 </div>
 
 
-<form class="mb-3 mt-3" #searchForm="ngForm" (ngSubmit)=(onSubmit(searchForm))>
+<form class="mb-3 mt-3 alert alert-dark"
+  #apikeyForm="ngForm"
+  (ngSubmit)=(addApiKey(apikeyForm))
+  *ngIf="!queryService.isApiKeySet()">
+
+  <div class="form-inline align-items-start justify-content-center">
+    <input class="form-control mr-3"
+      type="text"
+      name="apikey"
+
+      [(ngModel)]="apiKey"
+      required
+      minlength="8">
+
+    <button class="btn">Save API key to loacalstorage</button>
+  </div>
+</form>
+
+<form class="mb-3 mt-3"
+  #searchForm="ngForm"
+  (ngSubmit)=(onSubmit(searchForm))
+  *ngIf="queryService.isApiKeySet()">
+
   <div class="form-inline align-items-start justify-content-center">
     <div class="form-control-group">
 
