@@ -5,6 +5,9 @@ import { Observable, forkJoin, Subject } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 
+import { ActivatedRoute, LoadChildren } from '@angular/router';
+import { Location } from '@angular/common';
+
 @Component({
   selector: 'app-searchform',
   templateUrl: './searchform.component.html',
@@ -38,10 +41,15 @@ export class SearchformComponent implements OnInit {
 
   private apikey;
 
-  constructor(private queryService: QueryService) { }
+  constructor(
+    private queryService: QueryService,
+    private route: ActivatedRoute,
+    private location: Location
+  ) { }
 
   ngOnInit() {
     const apikey = localStorage.getItem('omdbapikey');
+
     if (apikey === null) {
       console.log('No API key found in localstorage, please visit https://www.omdbapi.com/');
       // prompt key input
@@ -49,7 +57,12 @@ export class SearchformComponent implements OnInit {
       console.log('Loading API key from localstorage');
       this.queryService.setApiKey(apikey);
     }
+
     this.queryService.p_queryProgress.subscribe( progress => this.progress = progress );
+
+    if (this.route.snapshot.paramMap.get('title') !== null) {
+      this.doMainQuery(this.route.snapshot.paramMap.get('title'));
+    }
   }
 
   onAnimationDone(event): void {
@@ -63,40 +76,43 @@ export class SearchformComponent implements OnInit {
     }
   }
 
+  doMainQuery(title) {
+    this.queryService.getResult(title).subscribe( result => {
+      this.result = result;
+
+      if ( this.result.Response.toLowerCase() === 'true') {
+
+        if (result.Type === 'movie') {
+          this.loading = false;
+          this.loaded = true;
+          this.queryService.completeLoadingBar();
+          this.queryService.hideGraph(true);
+
+        } else if (result.Type === 'series') {
+          // get an array of season numbers
+          const seasons: number[] = new Array(parseInt(result.totalSeasons, 10)).fill('').map((v, i) => i + 1);
+
+          this.queryService.getSeasonsFormattedForGraph(seasons, result.imdbID).subscribe( series => {
+            this.loading = false;
+            this.loaded = true;
+            this.queryService.setSeries(series);
+            this.queryService.completeLoadingBar();
+            this.queryService.hideGraph(false);
+          });
+        }
+      } else {
+        this.loading = false;
+        this.loaded = true;
+        this.result = result;
+        this.queryService.completeLoadingBar();
+      }
+    });
+  }
+
   onSubmit({value, valid}: {value: {search: string}, valid: string}) {
     if (this.queryService.isApiKeySet()) {
       this.loading = true;
-
-      this.queryService.getResult(value.search).subscribe( result => {
-        this.result = result;
-
-        if ( this.result.Response.toLowerCase() === 'true') {
-
-          if (result.Type === 'movie') {
-            this.loading = false;
-            this.loaded = true;
-            this.queryService.completeLoadingBar();
-            this.queryService.hideGraph(true);
-
-          } else if (result.Type === 'series') {
-            // get an array of season numbers
-            const seasons: number[] = new Array(parseInt(result.totalSeasons, 10)).fill('').map((v, i) => i + 1);
-
-            this.queryService.getSeasonsFormattedForGraph(seasons, result.imdbID).subscribe( series => {
-              this.loading = false;
-              this.loaded = true;
-              this.queryService.setSeries(series);
-              this.queryService.completeLoadingBar();
-              this.queryService.hideGraph(false);
-            });
-          }
-        } else {
-          this.loading = false;
-          this.loaded = true;
-          this.result = result;
-          this.queryService.completeLoadingBar();
-        }
-      });
+      this.doMainQuery(value.search);
     }
   }
   addApiKey({value, valid}: {value: {apikey: string}, valid: string}) {

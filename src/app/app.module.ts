@@ -5,12 +5,20 @@ import { HttpClientModule, HttpClientJsonpModule  } from '@angular/common/http';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+import { RouterModule, Routes } from '@angular/router';
+
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { SearchformComponent } from './components/searchform/searchform.component';
 import { QueryService } from './services/query.service';
 import { GraphComponent } from './components/graph/graph.component';
 
+
+const routes: Routes = [
+  { path: '', component: SearchformComponent },
+  { path: ':title', component: SearchformComponent },
+  { path: '**', component: SearchformComponent }
+];
 @NgModule({
   declarations: [
     AppComponent,
@@ -22,6 +30,7 @@ import { GraphComponent } from './components/graph/graph.component';
     HttpClientModule,
     HttpClientJsonpModule,
     BrowserModule,
+    RouterModule.forRoot(routes),
     BrowserAnimationsModule,
     FormsModule,
     NgxChartsModule
